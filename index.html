@@ -1,0 +1,1400 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Semester Ledger</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Pure Black & White Monochrome Design System */
+:root{
+  --bg:#FFFFFF;
+  --surface:#FAFAFA;
+  --surface-subtle:#F2F2F2;
+  --ink:#000000;
+  --muted:#666666;
+  --line:#E2E2E2;
+  --line-strong:#000000;
+  --accent:#000000;
+  --accent-ink:#FFFFFF;
+  --tag-bg:#EAEAEA;
+  --tag-ink:#000000;
+  --good:#000000;
+  --warn:#666666;
+  --bad:#000000;
+  --f-display:"Familjen Grotesk",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#000000;
+    --surface:#0A0A0A;
+    --surface-subtle:#161616;
+    --ink:#FFFFFF;
+    --muted:#8A8A8A;
+    --line:#242424;
+    --line-strong:#FFFFFF;
+    --accent:#FFFFFF;
+    --accent-ink:#000000;
+    --tag-bg:#1C1C1C;
+    --tag-ink:#FFFFFF;
+    --good:#FFFFFF;
+    --warn:#8A8A8A;
+    --bad:#FFFFFF;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#000000;
+  --surface:#0A0A0A;
+  --surface-subtle:#161616;
+  --ink:#FFFFFF;
+  --muted:#8A8A8A;
+  --line:#242424;
+  --line-strong:#FFFFFF;
+  --accent:#FFFFFF;
+  --accent-ink:#000000;
+  --tag-bg:#1C1C1C;
+  --tag-ink:#FFFFFF;
+  --good:#FFFFFF;
+  --warn:#8A8A8A;
+  --bad:#FFFFFF;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#FFFFFF;
+  --surface:#FAFAFA;
+  --surface-subtle:#F2F2F2;
+  --ink:#000000;
+  --muted:#666666;
+  --line:#E2E2E2;
+  --line-strong:#000000;
+  --accent:#000000;
+  --accent-ink:#FFFFFF;
+  --tag-bg:#EAEAEA;
+  --tag-ink:#000000;
+  --good:#000000;
+  --warn:#666666;
+  --bad:#000000;
+  color-scheme:light;
+}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;transition:background .15s,color .15s}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+header.mast{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--surface);border-bottom:1px solid var(--line)}
+.mast .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px;padding-top:12px}
+.brand{display:flex;flex-direction:column;min-width:0}
+.brand h1{font-family:var(--f-display);font-size:1.35rem;line-height:1.1;margin:0;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+.brand span{font-size:.78rem;color:var(--muted);font-family:var(--f-mono);margin-top:2px}
+
+.mast-right{display:flex;align-items:center;gap:10px;flex-wrap:nowrap}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;max-width:100%}
+nav.tabs button{font:500 .9rem var(--f-body);color:var(--muted);background:none;border:0;border-bottom:2px solid transparent;padding:10px 12px;cursor:pointer;white-space:nowrap;transition:all .15s}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:600}
+nav.tabs button:hover{color:var(--ink)}
+
+/* Theme Toggle Button */
+.btn-theme{font:600 .76rem var(--f-mono);padding:5px 10px;border-radius:4px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:all .15s}
+.btn-theme:hover{border-color:var(--ink);background:var(--surface-subtle)}
+
+/* Semester Switcher Bar */
+.sem-nav-wrap{background:var(--surface);border-bottom:1px solid var(--line)}
+.sem-nav{display:flex;align-items:center;gap:6px;overflow-x:auto;padding:8px 0;scrollbar-width:none}
+.sem-nav::-webkit-scrollbar{display:none}
+.sem-label{font:600 .7rem var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-right:4px;white-space:nowrap}
+.sem-pill{display:inline-flex;align-items:center;gap:6px;font:500 .82rem var(--f-mono);padding:5px 11px;border-radius:20px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .15s}
+.sem-pill:hover{border-color:var(--ink);color:var(--ink)}
+.sem-pill.active{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.sem-pill .tag{font-size:.64rem;padding:1px 6px;border-radius:10px;background:var(--tag-bg);color:var(--tag-ink);text-transform:uppercase}
+.sem-pill.active .tag{background:var(--bg);color:var(--ink)}
+
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+main{padding-block:20px 56px}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);border-block:1px solid var(--line);margin-bottom:24px}
+.strip>div{padding:14px 16px 14px 0;min-width:0}
+.strip>div+div{padding-left:16px;border-left:1px solid var(--line)}
+.lbl{font:600 .72rem var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.big{font:700 1.9rem/1.1 var(--f-display);font-variant-numeric:tabular-nums;margin-top:4px;letter-spacing:-.02em;color:var(--ink)}
+.sub{font-size:.8rem;color:var(--muted);margin-top:2px}
+h2{font:700 1.25rem var(--f-display);margin:0 0 4px;letter-spacing:-.01em;text-wrap:balance;color:var(--ink)}
+p.lede{margin:0 0 16px;color:var(--muted);max-width:75ch}
+section.panel[hidden]{display:none}
+.controls{display:flex;flex-wrap:wrap;gap:12px 20px;margin:12px 0 20px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font:600 .72rem var(--f-mono);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+input[type=text],input[type=number],input[type=date],select{font:500 .92rem var(--f-mono);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:3px;padding:7px 9px;width:100%;max-width:160px;min-width:0}
+input[type=range]{width:100%;accent-color:var(--ink)}
+
+.overall{display:grid;grid-template-columns:150px 1fr;gap:20px 28px;align-items:center;padding:16px 0 20px;border-bottom:1px solid var(--line)}
+.ring{position:relative;width:150px;height:150px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .c{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font:700 1.6rem var(--f-display);font-variant-numeric:tabular-nums;color:var(--ink)}
+.ring .c small{display:block;font:400 .7rem var(--f-mono);color:var(--muted)}
+.facts{display:grid;gap:6px;min-width:0}
+.facts p{margin:0}
+.sim{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.sim output{font:600 1rem var(--f-mono);color:var(--ink)}
+
+/* Black & White Status Pills */
+.pill{display:inline-block;font:600 .7rem var(--f-mono);padding:2px 8px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.pill.good{border:1px solid var(--ink);color:var(--ink);background:transparent}
+.pill.warn{border:1px dashed var(--muted);color:var(--muted);background:transparent}
+.pill.bad{border:1px solid var(--ink);color:var(--bg);background:var(--ink)}
+.pill.na{border:1px solid var(--line);color:var(--muted);background:transparent}
+
+.crow{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) 110px minmax(0,1.5fr);gap:6px 16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.crow .cname{font-weight:600;min-width:0;color:var(--ink)}
+.crow .cname small{display:block;font:400 .72rem var(--f-mono);color:var(--muted)}
+
+/* Black & White Progress Bars */
+.bar{position:relative;height:7px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:2px;background:var(--ink)}
+.bar i.bad{background:repeating-linear-gradient(45deg,var(--ink),var(--ink) 3px,transparent 3px,transparent 6px)}
+.bar i.warn{background:var(--muted)}
+.bar i.good{background:var(--ink)}
+.bar b{position:absolute;top:0;bottom:0;width:2px;background:var(--bg);box-shadow:0 0 0 1px var(--ink)}
+
+.cnum{font:500 .85rem var(--f-mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.cnote{font-size:.85rem;color:var(--muted);min-width:0}
+.cnote .pill{margin-right:6px}
+details{margin-top:24px;border-top:1px solid var(--line);padding-top:12px}
+summary{cursor:pointer;font-weight:600;user-select:none;color:var(--ink)}
+.tw{overflow-x:auto;margin-top:10px}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th{font:600 .7rem var(--f-mono);text-transform:uppercase;letter-spacing:.07em;color:var(--muted);text-align:left;padding:6px 10px 6px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 10px 7px 0;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--ink)}
+td.n,th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+td input[type=number], td input[type=text], td select{padding:5px 7px;font-size:.86rem}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;margin-top:20px}
+.cols>div{min-width:0}
+h3{font:700 1rem var(--f-display);margin:0 0 8px;color:var(--ink)}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+.presets button, .btn{font:500 .82rem var(--f-mono);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:3px;padding:6px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+.presets button:hover, .btn:hover{border-color:var(--ink);color:var(--ink);background:var(--surface-subtle)}
+.btn-accent{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn-accent:hover{background:var(--ink);color:var(--bg);opacity:.85}
+.btn-sm{padding:4px 8px;font-size:.78rem}
+.btn-del{color:var(--muted);border:1px solid transparent;background:transparent;cursor:pointer;font:600 .85rem var(--f-mono);padding:2px 7px;border-radius:3px}
+.btn-del:hover{color:var(--ink);border-color:var(--line);background:var(--surface-subtle)}
+
+.result{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;border-block:1px solid var(--line);margin:16px 0}
+.result>div{padding:12px 14px 12px 0}
+.result>div+div{padding-left:14px;border-left:1px solid var(--line)}
+.note{font-size:.82rem;color:var(--muted);max-width:75ch;margin-top:12px}
+
+/* Exam Card Styles */
+.exam{display:grid;grid-template-columns:96px minmax(0,1fr) auto auto;gap:8px 16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);transition:background .15s}
+.exam.editing-exam{background:var(--surface-subtle);border-radius:4px;padding:16px;margin-block:8px;border:1px solid var(--line)}
+.exam .d{font:700 1.6rem/1 var(--f-display);font-variant-numeric:tabular-nums;color:var(--ink)}
+.exam .d small{display:block;font:400 .7rem var(--f-mono);color:var(--muted);margin-top:4px}
+.exam .t{min-width:0}
+.exam .t strong{display:block;color:var(--ink)}
+.exam .t span{font-size:.85rem;color:var(--muted)}
+.exam .left{text-align:right;font:500 .85rem var(--f-mono)}
+.exam-actions{display:flex;align-items:center;gap:6px}
+
+/* Roadmap & Planner */
+.roadmap-wrap{margin-top:20px;border-radius:4px;border:1px solid var(--line);background:var(--surface);padding:16px}
+.roadmap-table tr.active-sem-row{background:var(--surface-subtle);font-weight:600}
+.sgpa-box{width:70px;padding:4px 6px;text-align:right;font-family:var(--f-mono)}
+.empty-box{padding:28px 16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:4px;margin:16px 0}
+
+/* Form row styling for Add course/exam */
+.add-form-inline{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end;margin-top:14px;padding:12px;background:var(--surface-subtle);border-radius:4px;border:1px solid var(--line)}
+.add-form-inline .field{flex:1 1 140px}
+.add-form-inline .field input,.add-form-inline .field select{max-width:100%}
+
+@media (max-width:640px){
+  .strip{grid-template-columns:1fr 1fr}
+  .strip>div:nth-child(3){border-left:0;padding-left:0}
+  .strip>div:nth-child(n+3){border-top:1px solid var(--line)}
+  .overall{grid-template-columns:1fr;justify-items:start}
+  .crow{grid-template-columns:1fr auto}
+  .crow .bar{grid-column:1/-1;order:3}
+  .crow .cnote{grid-column:1/-1;order:4}
+  .exam{grid-template-columns:72px minmax(0,1fr) auto}
+  .exam .left{grid-column:1/-1;text-align:left}
+}
+@media (prefers-reduced-motion:no-preference){.bar i{transition:width .3s}}
+</style>
+
+<!-- Shared Datalist for active semester subjects -->
+<datalist id="sem-subject-list"></datalist>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="brand">
+      <h1>Semester Ledger</h1>
+      <span id="mast-sub">Mayank · URN 2581199 · B.Tech CSE · Sem III</span>
+    </div>
+    <div class="mast-right">
+      <nav class="tabs" role="tablist" aria-label="Sections">
+        <button role="tab" id="t-attendance" aria-selected="true" data-tab="attendance">Subjects &amp; Attendance</button>
+        <button role="tab" id="t-backlogs" aria-selected="false" data-tab="backlogs">Backlogs &amp; CGPA</button>
+        <button role="tab" id="t-fees" aria-selected="false" data-tab="fees">Reappear fees</button>
+        <button role="tab" id="t-exams" aria-selected="false" data-tab="exams">Exams</button>
+      </nav>
+      <button type="button" id="theme-btn" class="btn-theme" title="Toggle Stark White / Pitch Black theme">● B&amp;W Theme</button>
+    </div>
+  </div>
+</header>
+
+<div class="sem-nav-wrap">
+  <div class="wrap">
+    <div class="sem-nav" id="sem-nav" role="radiogroup" aria-label="Select Semester">
+      <!-- dynamic semester pills -->
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="strip" id="strip"></div>
+
+  <!-- Subjects & Attendance Panel -->
+  <section class="panel" id="p-attendance">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+      <div>
+        <h2 id="att-title">Subjects &amp; Attendance</h2>
+        <p class="lede" id="att-desc">Customize subjects, curriculum codes, and track attendance. Projection runs through the last teaching day.</p>
+      </div>
+      <div>
+        <button type="button" class="btn btn-sm btn-accent" id="btn-show-add-course">+ Add Subject</button>
+      </div>
+    </div>
+
+    <!-- Inline Add Subject Form -->
+    <div class="add-form-inline" id="box-add-course" style="display:none">
+      <div class="field"><label>Subject / Course Title</label><input type="text" id="new-c-name" placeholder="e.g. Operating Systems"></div>
+      <div class="field"><label>Course Code</label><input type="text" id="new-c-code" placeholder="e.g. CSE25401"></div>
+      <div class="field"><label>Type</label>
+        <select id="new-c-kind">
+          <option value="Theory">Theory</option>
+          <option value="Lab">Lab</option>
+          <option value="Project">Project</option>
+          <option value="Programme">Programme</option>
+          <option value="Course">Course</option>
+        </select>
+      </div>
+      <div class="field" style="max-width:80px"><label>Credits</label><input type="number" id="new-c-cr" value="3" min="1" max="15"></div>
+      <div class="field" style="max-width:90px"><label>Weekly classes</label><input type="number" id="new-c-wk" value="3" min="0" max="10"></div>
+      <div>
+        <button type="button" class="btn btn-accent btn-sm" id="btn-save-course">Save</button>
+        <button type="button" class="btn btn-sm" id="btn-cancel-course">Cancel</button>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="field"><label for="thr">Minimum %</label><input type="number" id="thr" data-k="thr" min="0" max="100" step="1"></div>
+      <div class="field"><label for="end">Last teaching day</label><input type="date" id="end" data-k="end"></div>
+      <div class="field"><label for="off">Weekdays off (holidays)</label><input type="number" id="off" data-k="off" min="0" max="30" step="1"></div>
+    </div>
+    <div id="att-overall"></div>
+    <div id="att-list"></div>
+
+    <details open>
+      <summary>Manage &amp; Edit Subjects for this Semester</summary>
+      <div class="tw"><table id="att-edit"></table></div>
+      <p class="note" id="att-note">You can directly rename subjects, change course codes, adjust types, credits, and weekly frequencies. Edits save instantly in your browser.</p>
+    </details>
+  </section>
+
+  <!-- Backlogs & CGPA Panel -->
+  <section class="panel" id="p-backlogs" hidden>
+    <h2>Backlogs and Degree CGPA</h2>
+    <p class="lede">Manage backlog papers from earlier terms and project your degree CGPA across all 8 semesters.</p>
+    
+    <div class="controls">
+      <div class="field"><label for="pts">Grade points so far (Sem 1-2)</label><input type="number" id="pts" data-k="pts" step="0.5"></div>
+      <div class="field"><label for="cr">Credits, Sem 1-2</label><input type="number" id="cr" data-k="cr" step="1"></div>
+      <div class="field"><label for="deg">Total Degree credits</label><input type="number" id="deg" data-k="deg" step="1"></div>
+      <div class="field"><label for="allowed">Attempts allowed</label><input type="number" id="allowed" data-k="allowed" min="1" step="1"></div>
+    </div>
+
+    <div class="tw"><table id="back-edit"></table></div>
+    <div class="presets" id="presets"></div>
+    <div id="back-out"></div>
+
+    <!-- Multi-Semester Roadmap / Degree Planner -->
+    <div class="roadmap-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div>
+          <h3>8-Semester Degree Progression Planner</h3>
+          <p class="lede" style="margin:0 0 8px">Set your target SGPA for upcoming semesters to preview your cumulative CGPA trajectory through graduation.</p>
+        </div>
+        <div class="presets">
+          <span class="lbl" style="align-self:center">Future targets:</span>
+          <button type="button" data-sgpa-preset="7.5">7.5 All</button>
+          <button type="button" data-sgpa-preset="8.0">8.0 All</button>
+          <button type="button" data-sgpa-preset="8.5">8.5 All</button>
+          <button type="button" data-sgpa-preset="9.0">9.0 All</button>
+        </div>
+      </div>
+      <div class="tw"><table class="roadmap-table" id="roadmap-table"></table></div>
+      <div id="roadmap-summary" style="margin-top:14px"></div>
+    </div>
+  </section>
+
+  <!-- Fees Panel -->
+  <section class="panel" id="p-fees" hidden>
+    <h2>Reappear charges</h2>
+    <p class="lede">Enter the reappear fee per paper from IILM's fee notice.</p>
+    <div class="controls">
+      <div class="field"><label for="fee">Fee per paper (₹)</label><input type="number" id="fee" data-k="fee" min="0" step="100"></div>
+    </div>
+    <div id="fee-out"></div>
+  </section>
+
+  <!-- Exams Panel -->
+  <section class="panel" id="p-exams" hidden>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+      <div>
+        <h2 id="exam-title">Exam schedule</h2>
+        <p class="lede" id="exam-desc">End-term examinations for the selected semester. Click ✎ Edit on any exam to modify its subject, code, or date.</p>
+      </div>
+      <div>
+        <button type="button" class="btn btn-sm btn-accent" id="btn-show-add-exam">+ Add Exam</button>
+      </div>
+    </div>
+
+    <!-- Inline Add Exam Form -->
+    <div class="add-form-inline" id="box-add-exam" style="display:none">
+      <div class="field">
+        <label>Subject / Course</label>
+        <input type="text" id="new-e-name" list="sem-subject-list" placeholder="Pick or type subject name">
+      </div>
+      <div class="field" style="max-width:120px"><label>Code</label><input type="text" id="new-e-code" placeholder="CSE25401"></div>
+      <div class="field" style="max-width:160px"><label>Exam Date</label><input type="date" id="new-e-date"></div>
+      <div class="field" style="max-width:130px"><label>Day of Week</label>
+        <select id="new-e-day">
+          <option value="Monday">Monday</option>
+          <option value="Tuesday">Tuesday</option>
+          <option value="Wednesday">Wednesday</option>
+          <option value="Thursday">Thursday</option>
+          <option value="Friday">Friday</option>
+          <option value="Saturday">Saturday</option>
+        </select>
+      </div>
+      <div>
+        <button type="button" class="btn btn-accent btn-sm" id="btn-save-exam">Save</button>
+        <button type="button" class="btn btn-sm" id="btn-cancel-exam">Cancel</button>
+      </div>
+    </div>
+
+    <div id="exam-out"></div>
+  </section>
+</main>
+
+<script>
+(function(){
+var KEY='semester-ledger-v2';
+var OLD_KEY='semester-ledger-v1';
+var THEME_KEY='semester-ledger-bw-theme';
+
+// Theme setup (default dark or saved)
+var savedTheme = localStorage.getItem(THEME_KEY);
+if(savedTheme){
+  document.documentElement.setAttribute('data-theme', savedTheme);
+} else {
+  var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+}
+
+function updateThemeButton(){
+  var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  var btn = document.getElementById('theme-btn');
+  if(btn){
+    btn.innerHTML = cur === 'dark' ? '○ White Mode' : '● Black Mode';
+  }
+}
+updateThemeButton();
+
+var SEMESTERS_META=[
+  {num:1,roman:'Sem I',label:'Semester 1',term:'AY 2025-26 (Odd)',status:'completed',cr:21,sgpa:4.14},
+  {num:2,roman:'Sem II',label:'Semester 2',term:'AY 2025-26 (Even)',status:'completed',cr:21,sgpa:4.14},
+  {num:3,roman:'Sem III',label:'Semester 3',term:'Odd Semester AY 2026-27',status:'current',cr:20,sgpa:8.0},
+  {num:4,roman:'Sem IV',label:'Semester 4',term:'Even Semester AY 2026-27',status:'upcoming',cr:20,sgpa:8.0},
+  {num:5,roman:'Sem V',label:'Semester 5',term:'Odd Semester AY 2027-28',status:'upcoming',cr:20,sgpa:8.0},
+  {num:6,roman:'Sem VI',label:'Semester 6',term:'Even Semester AY 2027-28',status:'upcoming',cr:20,sgpa:8.0},
+  {num:7,roman:'Sem VII',label:'Semester 7',term:'Odd Semester AY 2028-29',status:'upcoming',cr:19,sgpa:8.0},
+  {num:8,roman:'Sem VIII',label:'Semester 8',term:'Even Semester AY 2028-29',status:'upcoming',cr:18,sgpa:8.0}
+];
+
+var DEFAULT_BACKLOGS=[
+  {id:'b1',name:'Digital Electronics and Computer Organization',cr:3},
+  {id:'b2',name:'Semiconductor Devices and Quantum Physics',cr:3},
+  {id:'b3',name:'Applied Calculus',cr:3},
+  {id:'b4',name:'Python Programming Lab',cr:1},
+  {id:'b5',name:'Data Structures and Algorithms',cr:3},
+  {id:'b6',name:'Data Structures and Algorithms Lab',cr:1}
+];
+
+function defaultSemesterCourses(num){
+  if(num===1){
+    return [
+      {id:'em1',name:'Engineering Mathematics I',code:'MTH101',kind:'Theory',cr:4,att:38,sch:42,wk:4},
+      {id:'ap',name:'Applied Physics',code:'PHY101',kind:'Theory',cr:3,att:28,sch:36,wk:3},
+      {id:'apl',name:'Applied Physics Lab',code:'PHY101P',kind:'Lab',cr:1,att:10,sch:12,wk:1},
+      {id:'bee',name:'Basic Electrical & Electronics',code:'EE101',kind:'Theory',cr:3,att:29,sch:34,wk:3},
+      {id:'cprog',name:'Problem Solving with C',code:'CSE101',kind:'Theory',cr:3,att:30,sch:35,wk:3},
+      {id:'cprogl',name:'C Programming Lab',code:'CSE101P',kind:'Lab',cr:1,att:11,sch:12,wk:1},
+      {id:'eg',name:'Engineering Graphics & Design',code:'ME101',kind:'Lab',cr:2,att:10,sch:12,wk:2},
+      {id:'comm',name:'Professional Communication',code:'HUM101',kind:'Theory',cr:2,att:18,sch:22,wk:2},
+      {id:'ind',name:'Induction Programme',code:'',kind:'Programme',cr:2,att:15,sch:15,wk:1}
+    ];
+  }
+  if(num===2){
+    return [
+      {id:'em2',name:'Applied Calculus',code:'MTH102',kind:'Theory',cr:3,att:18,sch:36,wk:3},
+      {id:'sdqp',name:'Semiconductor Devices & Quantum Physics',code:'PHY102',kind:'Theory',cr:3,att:16,sch:36,wk:3},
+      {id:'deco',name:'Digital Electronics & Computer Organization',code:'ECE102',kind:'Theory',cr:3,att:17,sch:35,wk:3},
+      {id:'decol',name:'Digital Electronics Lab',code:'ECE102P',kind:'Lab',cr:1,att:8,sch:12,wk:1},
+      {id:'dsa2',name:'Data Structures and Algorithms',code:'CSE102',kind:'Theory',cr:3,att:18,sch:36,wk:3},
+      {id:'dsal2',name:'Data Structures and Algorithms Lab',code:'CSE102P',kind:'Lab',cr:1,att:5,sch:12,wk:1},
+      {id:'pythl',name:'Python Programming Lab',code:'CSE104P',kind:'Lab',cr:1,att:4,sch:12,wk:1},
+      {id:'evs',name:'Environmental Science',code:'ENV101',kind:'Course',cr:2,att:15,sch:20,wk:2},
+      {id:'ws',name:'Manufacturing Practices Workshop',code:'ME102P',kind:'Lab',cr:2,att:10,sch:12,wk:2},
+      {id:'ss',name:'Soft Skills & Personality Development',code:'HUM102',kind:'Programme',cr:2,att:12,sch:16,wk:2}
+    ];
+  }
+  if(num===3){
+    return [
+      {id:'daa',name:'Design and Analysis of Algorithms',code:'CSE25303',kind:'Theory',cr:3,att:13,sch:33,wk:3},
+      {id:'daal',name:'Design and Analysis of Algorithms Lab',code:'CSE25303P',kind:'Lab',cr:1,att:9,sch:11,wk:1},
+      {id:'oop',name:'Object Oriented Programming',code:'CSE25304',kind:'Theory',cr:3,att:17,sch:29,wk:3},
+      {id:'oopl',name:'Object Oriented Programming Lab',code:'CSE25304P',kind:'Lab',cr:1,att:2,sch:11,wk:1},
+      {id:'ds',name:'Discrete Structures',code:'CSE25301',kind:'Theory',cr:3,att:16,sch:20,wk:3},
+      {id:'dsl',name:'Discrete Structures Lab',code:'CSE25301P',kind:'Lab',cr:1,att:1,sch:5,wk:1},
+      {id:'cyber',name:'Foundations of Cybersecurity',code:'CSE25305',kind:'Theory',cr:2,att:9,sch:15,wk:2},
+      {id:'vcs',name:'Version Control Systems',code:'CSE25302',kind:'Theory',cr:2,att:20,sch:23,wk:2},
+      {id:'iot',name:'IoT and Robotics Foundation',code:'CSE25309',kind:'Theory',cr:2,att:2,sch:10,wk:1},
+      {id:'iotl',name:'IoT and Robotics Foundation Lab',code:'CSE25309',kind:'Lab',cr:1,att:2,sch:6,wk:1},
+      {id:'irp',name:'Industry Readiness Programme-I',code:'',kind:'Programme',cr:1,att:5,sch:12,wk:1},
+      {id:'iks',name:'Indian Knowledge System (MOOC)',code:'',kind:'MOOC',cr:1,att:0,sch:0,wk:0},
+      {id:'tsd',name:'Technology for Sustainable Development',code:'',kind:'Course',cr:1,att:0,sch:0,wk:0}
+    ];
+  }
+  if(num===4){
+    return [
+      {id:'os',name:'Operating Systems',code:'CSE25401',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'osl',name:'Operating Systems Lab',code:'CSE25401P',kind:'Lab',cr:1,att:0,sch:0,wk:1},
+      {id:'dbms',name:'Database Management Systems',code:'CSE25402',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'dbmsl',name:'Database Management Systems Lab',code:'CSE25402P',kind:'Lab',cr:1,att:0,sch:0,wk:1},
+      {id:'coa',name:'Computer Architecture & Organization',code:'CSE25403',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'toc',name:'Theory of Computation',code:'CSE25404',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'web',name:'Full Stack Web Technologies',code:'CSE25405',kind:'Theory',cr:2,att:0,sch:0,wk:2},
+      {id:'webl',name:'Web Technologies Lab',code:'CSE25405P',kind:'Lab',cr:1,att:0,sch:0,wk:1},
+      {id:'irp2',name:'Industry Readiness Programme-II',code:'',kind:'Programme',cr:1,att:0,sch:0,wk:1},
+      {id:'env',name:'Disaster Management & Ecology',code:'',kind:'Course',cr:2,att:0,sch:0,wk:1}
+    ];
+  }
+  if(num===5){
+    return [
+      {id:'cn',name:'Computer Networks',code:'CSE25501',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'cnl',name:'Computer Networks Lab',code:'CSE25501P',kind:'Lab',cr:1,att:0,sch:0,wk:1},
+      {id:'aiml',name:'Artificial Intelligence & Machine Learning',code:'CSE25502',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'aimll',name:'AI & Machine Learning Lab',code:'CSE25502P',kind:'Lab',cr:1,att:0,sch:0,wk:1},
+      {id:'se',name:'Software Engineering & Agile',code:'CSE25503',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'pe1',name:'Professional Elective I (Cloud / DevOps)',code:'CSE25504',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'oe1',name:'Open Elective I',code:'OE25501',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'irp3',name:'Industry Readiness Programme-III',code:'',kind:'Programme',cr:1,att:0,sch:0,wk:1},
+      {id:'mini',name:'Minor Project / Capstone I',code:'CSE25509',kind:'Project',cr:2,att:0,sch:0,wk:2}
+    ];
+  }
+  if(num===6){
+    return [
+      {id:'cd',name:'Compiler Design',code:'CSE25601',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'cdl',name:'Compiler Design Lab',code:'CSE25601P',kind:'Lab',cr:1,att:0,sch:0,wk:1},
+      {id:'cns',name:'Cryptography & Network Security',code:'CSE25602',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'pe2',name:'Professional Elective II (Big Data Analytics)',code:'CSE25603',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'pe3',name:'Professional Elective III (Mobile App Dev)',code:'CSE25604',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'oe2',name:'Open Elective II',code:'OE25601',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'cap2',name:'Minor Project / Capstone II',code:'CSE25609',kind:'Project',cr:2,att:0,sch:0,wk:2},
+      {id:'irp4',name:'Industry Readiness Programme-IV',code:'',kind:'Programme',cr:1,att:0,sch:0,wk:1}
+    ];
+  }
+  if(num===7){
+    return [
+      {id:'dl',name:'Deep Learning & Neural Networks',code:'CSE25701',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'pe4',name:'Professional Elective IV (Distributed Systems)',code:'CSE25702',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'pe5',name:'Professional Elective V (Blockchain Tech)',code:'CSE25703',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'oe3',name:'Open Elective III',code:'OE25701',kind:'Theory',cr:3,att:0,sch:0,wk:3},
+      {id:'proj1',name:'Major Project Phase I',code:'CSE25709',kind:'Project',cr:4,att:0,sch:0,wk:4},
+      {id:'intern',name:'Summer Internship Assessment',code:'CSE25710',kind:'Programme',cr:2,att:0,sch:0,wk:1}
+    ];
+  }
+  if(num===8){
+    return [
+      {id:'proj2',name:'Major Project Phase II / Industry Internship',code:'CSE25801',kind:'Project',cr:14,att:0,sch:0,wk:10},
+      {id:'viva',name:'Comprehensive Seminar & Technical Viva',code:'CSE25802',kind:'Programme',cr:2,att:0,sch:0,wk:2},
+      {id:'uhv',name:'Universal Human Values & Professional Ethics',code:'HUM25801',kind:'Theory',cr:2,att:0,sch:0,wk:2}
+    ];
+  }
+  return [];
+}
+
+function defaultSemesterExams(num){
+  if(num===3){
+    return [
+      {id:'e1',date:'2026-12-04',day:'Friday',code:'CSE25303',name:'Design and Analysis of Algorithms',cid:'daa'},
+      {id:'e2',date:'2026-12-07',day:'Monday',code:'CSE25304',name:'Object Oriented Programming',cid:'oop'},
+      {id:'e3',date:'2026-12-09',day:'Wednesday',code:'CSE25301',name:'Discrete Structures',cid:'ds'},
+      {id:'e4',date:'2026-12-11',day:'Friday',code:'CSE25305',name:'Foundations of Cybersecurity',cid:'cyber'}
+    ];
+  }
+  return [];
+}
+
+function defaultDates(num){
+  if(num===1)return {end:'2025-11-30',off:0,thr:75};
+  if(num===2)return {end:'2026-05-15',off:0,thr:75};
+  if(num===3)return {end:'2026-11-30',off:0,thr:75};
+  if(num===4)return {end:'2027-05-15',off:2,thr:75};
+  if(num===5)return {end:'2027-11-30',off:2,thr:75};
+  if(num===6)return {end:'2028-05-15',off:2,thr:75};
+  if(num===7)return {end:'2028-11-30',off:2,thr:75};
+  if(num===8)return {end:'2029-05-15',off:2,thr:75};
+  return {end:'2027-05-15',off:0,thr:75};
+}
+
+function buildInitialState(){
+  var sems={};
+  SEMESTERS_META.forEach(function(m){
+    var d=defaultDates(m.num);
+    sems[m.num]={
+      num:m.num,
+      name:m.label,
+      roman:m.roman,
+      term:m.term,
+      status:m.status,
+      cr:m.cr,
+      sgpa:m.sgpa,
+      thr:d.thr,
+      end:d.end,
+      off:d.off,
+      sim:70,
+      courses:defaultSemesterCourses(m.num),
+      exams:defaultSemesterExams(m.num)
+    };
+  });
+
+  return {
+    version:2,
+    activeSem:3,
+    editingExamIdx:null,
+    pts:174,
+    cr:42,
+    deg:160,
+    allowed:3,
+    fee:2000,
+    future:8.0,
+    b:DEFAULT_BACKLOGS.map(function(b){return {cr:b.cr,gp:9,used:1,on:true}}),
+    semesters:sems
+  };
+}
+
+var st=buildInitialState();
+
+// Load from storage
+try{
+  var raw=localStorage.getItem(KEY);
+  if(raw){
+    var parsed=JSON.parse(raw);
+    if(parsed&&parsed.semesters){
+      st=Object.assign(buildInitialState(),parsed);
+      st.editingExamIdx = null;
+    }
+  } else {
+    var oldRaw=localStorage.getItem(OLD_KEY);
+    if(oldRaw){
+      var oldP=JSON.parse(oldRaw);
+      if(oldP){
+        if(oldP.pts)st.pts=oldP.pts;
+        if(oldP.cr)st.cr=oldP.cr;
+        if(oldP.deg)st.deg=oldP.deg;
+        if(oldP.fee)st.fee=oldP.fee;
+        if(oldP.allowed)st.allowed=oldP.allowed;
+        if(oldP.b&&oldP.b.length===DEFAULT_BACKLOGS.length)st.b=oldP.b;
+        if(oldP.c&&oldP.c.length===st.semesters[3].courses.length){
+          oldP.c.forEach(function(item,i){
+            if(st.semesters[3].courses[i]){
+              st.semesters[3].courses[i].att=item.att;
+              st.semesters[3].courses[i].sch=item.sch;
+              st.semesters[3].courses[i].wk=item.wk;
+            }
+          });
+        }
+        if(oldP.thr)st.semesters[3].thr=oldP.thr;
+        if(oldP.end)st.semesters[3].end=oldP.end;
+        if(oldP.off!==undefined)st.semesters[3].off=oldP.off;
+        if(oldP.sim!==undefined)st.semesters[3].sim=oldP.sim;
+      }
+    }
+  }
+}catch(e){console.warn('Storage read error',e);}
+
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}
+}
+
+function $(s){return document.querySelector(s)}
+function f2(x){return (Math.round(x*100)/100).toFixed(2)}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function getActiveSemester(){
+  return st.semesters[st.activeSem] || st.semesters[3];
+}
+
+/* dates */
+function today(){var d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
+function parse(s){var a=(s||'').split('-');return new Date(+a[0]||2026,(+a[1]||1)-1,+a[2]||1)}
+function daysUntil(s){return Math.round((parse(s)-today())/864e5)}
+function weekdaysLeftForSem(sem){
+  var d=today(),e=parse(sem.end||'2026-11-30'),n=0;
+  if(d>=e)return 0;
+  var cur=new Date(d.getTime());
+  cur.setDate(cur.getDate()+1);
+  while(cur<=e){var w=cur.getDay();if(w>0&&w<6)n++;cur.setDate(cur.getDate()+1)}
+  return n;
+}
+function weeksLeftForSem(sem){
+  return Math.max(0,weekdaysLeftForSem(sem)-(+sem.off||0))/5;
+}
+
+/* attendance math */
+function calc(A,S,rem,t){
+  t=t/100;var tot=S+rem,pct=S?A/S:null;
+  var maxPct=tot?(A+rem)/tot:null;
+  var need=Math.ceil(t*tot-A-1e-9);
+  var r={A:A,S:S,rem:rem,pct:pct,maxPct:maxPct,need:Math.max(0,need)};
+  if(!S&&!rem){r.s='na';return r}
+  if(need<=0){r.s='good';r.canMiss=Math.floor(A+rem-t*tot+1e-9);}
+  else if(need<=rem){r.s='warn'}
+  else r.s='bad';
+  return r;
+}
+function semRemaining(sem,i){
+  var c=sem.courses[i];if(!c)return 0;
+  return Math.round((+c.wk||0)*weeksLeftForSem(sem));
+}
+function semCourseCalc(sem,i){
+  var c=sem.courses[i];if(!c)return calc(0,0,0,75);
+  return calc(+c.att||0,+c.sch||0,semRemaining(sem,i),+sem.thr||75);
+}
+function semOverall(sem){
+  var A=0,S=0,R=0;
+  sem.courses.forEach(function(c,i){A+=+c.att||0;S+=+c.sch||0;R+=semRemaining(sem,i)});
+  return calc(A,S,R,+sem.thr||75);
+}
+function pillHtml(s,txt){return '<span class="pill '+s+'">'+txt+'</span>'}
+
+/* cgpa math */
+function newPoints(){var x=0;st.b.forEach(function(b){x+=(+b.cr||0)*(+b.gp||0)});return x}
+function backCredits(){var x=0;st.b.forEach(function(b){x+=+b.cr||0});return x}
+function cgpaNow(){return st.cr?st.pts/st.cr:0}
+function cgpaAfter(){return st.cr?(st.pts+newPoints())/st.cr:0}
+
+/* Multi-semester CGPA progression calculator */
+function calcDegreeRoadmap(){
+  var totalCredits=0, totalPoints=0;
+  var list=[];
+  
+  var clearedPts = st.pts + newPoints();
+  var sem12Cr = st.cr || 42;
+  var sem1Cr = st.semesters[1].cr || 21;
+  var sem2Cr = st.semesters[2].cr || 21;
+  
+  var s1Pts = (sem1Cr / sem12Cr) * clearedPts;
+  var s2Pts = (sem2Cr / sem12Cr) * clearedPts;
+
+  SEMESTERS_META.forEach(function(m){
+    var semObj = st.semesters[m.num];
+    var cr = +semObj.cr || m.cr;
+    var sgpa = +semObj.sgpa || 8.0;
+    var pts = 0;
+    
+    if(m.num === 1){
+      pts = s1Pts;
+      sgpa = cr ? pts / cr : 4.14;
+    } else if(m.num === 2){
+      pts = s2Pts;
+      sgpa = cr ? pts / cr : 4.14;
+    } else {
+      pts = cr * sgpa;
+    }
+
+    totalCredits += cr;
+    totalPoints += pts;
+    var cumulativeCgpa = totalCredits ? (totalPoints / totalCredits) : 0;
+    
+    list.push({
+      num: m.num,
+      name: m.label,
+      roman: m.roman,
+      status: m.status,
+      cr: cr,
+      sgpa: sgpa,
+      pts: pts,
+      cumulativeCredits: totalCredits,
+      cumulativeCgpa: cumulativeCgpa,
+      isActive: st.activeSem === m.num
+    });
+  });
+
+  var finalCgpa = totalCredits ? (totalPoints / totalCredits) : 0;
+  return {list:list, totalCredits:totalCredits, totalPoints:totalPoints, finalCgpa:finalCgpa};
+}
+
+function money(x){return '₹'+Math.round(x).toLocaleString('en-IN')}
+
+/* UI Renderers */
+
+function updateSubjectDatalist(){
+  var sem = getActiveSemester();
+  var dl = $('#sem-subject-list');
+  if(!dl) return;
+  var options = (sem.courses||[]).map(function(c){
+    return '<option value="'+esc(c.name)+'" data-code="'+esc(c.code||'')+'">'+(c.code?esc(c.code)+' · ':'')+esc(c.name)+'</option>';
+  }).join('');
+  dl.innerHTML = options;
+}
+
+function renderSemPills(){
+  var html = '<span class="sem-label">Semesters:</span>';
+  SEMESTERS_META.forEach(function(m){
+    var isActive = st.activeSem === m.num;
+    var badge = m.status==='completed'?'Done':m.status==='current'?'Current':'Ahead';
+    html += '<button type="button" class="sem-pill '+(isActive?'active':'')+'" data-sem-btn="'+m.num+'">'+
+            m.roman+' <span class="tag">'+badge+'</span></button>';
+  });
+  $('#sem-nav').innerHTML = html;
+}
+
+function updStrip(){
+  var sem = getActiveSemester();
+  var o = semOverall(sem);
+  var nx = null;
+  
+  (sem.exams||[]).forEach(function(e){
+    var d = daysUntil(e.date);
+    if(d >= 0 && (!nx || d < nx.d)) nx = {d:d, e:e};
+  });
+
+  var roadmap = calcDegreeRoadmap();
+
+  $('#strip').innerHTML =
+    '<div><div class="lbl">'+esc(sem.roman)+' Attendance</div><div class="big">'+(o.pct!=null?f2(o.pct*100)+'%':'–')+'</div><div class="sub">'+o.A+' of '+o.S+' classes scheduled</div></div>'+
+    '<div><div class="lbl">Active Backlogs</div><div class="big">'+DEFAULT_BACKLOGS.length+' papers</div><div class="sub">'+backCredits()+' credits to clear</div></div>'+
+    '<div><div class="lbl">Graduation CGPA</div><div class="big">'+f2(roadmap.finalCgpa)+'</div><div class="sub">'+f2(roadmap.finalCgpa*9.5)+'% · Sem 1-8 projected</div></div>'+
+    '<div><div class="lbl">Next Exam ('+esc(sem.roman)+')</div><div class="big">'+(nx?nx.d+' days':'None')+'</div><div class="sub">'+(nx?esc(nx.e.name):'No exams scheduled')+'</div></div>';
+}
+
+function updAtt(){
+  var sem = getActiveSemester();
+  var o = semOverall(sem);
+  var t = +sem.thr || 75;
+  var wl = weeksLeftForSem(sem);
+  var circ = 2*Math.PI*52;
+  var pct = (o.pct || 0)*100;
+  var col = 'var(--ink)';
+  
+  $('#att-title').textContent = 'Subjects & Attendance · ' + sem.name + ' (' + sem.roman + ')';
+  $('#att-desc').textContent = sem.term + '. Edit subject titles, codes, or attendance counts directly below.';
+  
+  var msg;
+  if(o.S === 0 && o.rem === 0){
+    msg = 'No class records yet for this semester. You can edit subject names, codes, and weekly schedule in the table below.';
+  } else if(o.s==='good'){
+    msg = 'You are above '+t+'% for the term. You can skip up to <b>'+o.canMiss+'</b> of the next '+o.rem+' classes and stay safe.';
+  } else if(o.s==='warn'){
+    msg = 'To finish at '+t+'% you must attend <b>'+o.need+'</b> of the next '+o.rem+' classes ('+Math.round(o.need/o.rem*100)+'% of remaining).';
+  } else {
+    msg = 'Even attending all '+o.rem+' remaining classes gets you to <b>'+f2(o.maxPct*100)+'%</b>, short of '+t+'%. Focus on key recoverable courses.';
+  }
+
+  var simPct = (sem.sim !== undefined) ? sem.sim : 70;
+  var simCalc = o.S+o.rem ? ((o.A + o.rem * simPct / 100) / (o.S + o.rem) * 100) : 0;
+  var simText = '<output>'+simPct+'%</output> of remaining classes yields <b>'+f2(simCalc)+'%</b> overall';
+
+  $('#att-overall').innerHTML =
+    '<div class="overall"><div class="ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--line)" stroke-width="10"/><circle cx="60" cy="60" r="52" fill="none" stroke="'+col+'" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+(circ*pct/100)+' '+circ+'"/></svg><div class="c"><div>'+(o.pct!=null?f2(pct)+'%':'–')+'<small>overall</small></div></div></div>'+
+    '<div class="facts"><p><span class="lbl">Present</span> <b>'+o.A+'</b> &nbsp; <span class="lbl">Absent</span> <b>'+(o.S-o.A)+'</b> &nbsp; <span class="lbl">Left to term end</span> <b>'+o.rem+'</b> classes ('+f2(wl)+' weeks)</p><p>'+msg+'</p>'+
+    '<div class="sim"><label for="sim" class="lbl">If I attend this share of remaining classes</label><input type="range" id="sim" min="0" max="100" step="5" value="'+simPct+'"><p id="simtxt">'+simText+'</p></div></div></div>';
+
+  if(!sem.courses || sem.courses.length===0){
+    $('#att-list').innerHTML = '<div class="empty-box">No subjects listed for '+esc(sem.name)+'. Click <b>+ Add Subject</b> above to add your syllabus subjects!</div>';
+  } else {
+    var rows = sem.courses.map(function(c,i){return {c:c,i:i,r:semCourseCalc(sem,i)}});
+    rows.sort(function(a,b){var x=a.r.pct==null?9:a.r.pct,y=b.r.pct==null?9:b.r.pct;return x-y});
+    
+    $('#att-list').innerHTML = rows.map(function(x){
+      var r=x.r, c=x.c, note;
+      if(r.s==='na') note = pillHtml('na','No sessions')+'Nothing scheduled yet.';
+      else if(r.s==='good') note = pillHtml('good','Safe')+'Can skip '+r.canMiss+' of '+r.rem+' left.';
+      else if(r.s==='warn') note = pillHtml('warn','Recoverable')+'Attend '+r.need+' of '+r.rem+' left.';
+      else note = pillHtml('bad','Out of reach')+'Best case '+f2(r.maxPct*100)+'% with all '+r.rem+' left.';
+      
+      var w = r.pct==null?0:Math.min(100,r.pct*100);
+      return '<div class="crow"><div class="cname">'+esc(c.name)+'<small>'+(c.code?esc(c.code)+' · ':'')+esc(c.kind||'Theory')+' · '+(c.cr||3)+' cr</small></div>'+
+       '<div class="bar" role="img" aria-label="'+(r.pct==null?'No data':f2(r.pct*100)+' percent')+'"><i class="'+(r.s==='na'?'':r.s)+'" style="width:'+w+'%"></i><b style="left:calc('+t+'% - 1px)"></b></div>'+
+       '<div class="cnum">'+r.A+'/'+r.S+' · '+(r.pct==null?'–':f2(r.pct*100)+'%')+'</div><div class="cnote">'+note+'</div></div>';
+    }).join('');
+  }
+
+  // Update controls
+  $('#thr').value = sem.thr || 75;
+  $('#end').value = sem.end || '2026-11-30';
+  $('#off').value = sem.off || 0;
+
+  // Subjects & Attendance Edit table with inline subject name & code editing
+  var h = '<thead><tr>'+
+    '<th style="min-width:240px">Subject / Course Details</th>'+
+    '<th class="n" style="width:70px">Attended</th>'+
+    '<th class="n" style="width:70px">Scheduled</th>'+
+    '<th class="n" style="width:70px">Per week</th>'+
+    '<th class="n" style="width:65px">Credits</th>'+
+    '<th style="width:40px"></th>'+
+    '</tr></thead><tbody>';
+
+  (sem.courses||[]).forEach(function(c,i){
+    h += '<tr>'+
+    '<td>'+
+      '<div style="display:flex;flex-direction:column;gap:5px">'+
+        '<input type="text" value="'+esc(c.name)+'" data-c-field="name" data-c-idx="'+i+'" placeholder="Subject Name" style="font-weight:600;max-width:100%" aria-label="Subject name">'+
+        '<div style="display:flex;gap:6px;align-items:center">'+
+          '<input type="text" value="'+esc(c.code||'')+'" data-c-field="code" data-c-idx="'+i+'" placeholder="Code (e.g. CSE25401)" style="max-width:140px;font-size:.78rem;padding:3px 6px" aria-label="Subject code">'+
+          '<select data-c-field="kind" data-c-idx="'+i+'" style="max-width:110px;font-size:.78rem;padding:3px 6px" aria-label="Subject type">'+
+            '<option value="Theory"'+(c.kind==='Theory'?' selected':'')+'>Theory</option>'+
+            '<option value="Lab"'+(c.kind==='Lab'?' selected':'')+'>Lab</option>'+
+            '<option value="Project"'+(c.kind==='Project'?' selected':'')+'>Project</option>'+
+            '<option value="Programme"'+(c.kind==='Programme'?' selected':'')+'>Programme</option>'+
+            '<option value="Course"'+(c.kind==='Course'?' selected':'')+'>Course</option>'+
+          '</select>'+
+        '</div>'+
+      '</div>'+
+    '</td>'+
+    '<td class="n"><input type="number" aria-label="Attended, '+esc(c.name)+'" data-c-field="att" data-c-idx="'+i+'" min="0" value="'+(c.att||0)+'"></td>'+
+    '<td class="n"><input type="number" aria-label="Scheduled, '+esc(c.name)+'" data-c-field="sch" data-c-idx="'+i+'" min="0" value="'+(c.sch||0)+'"></td>'+
+    '<td class="n"><input type="number" aria-label="Classes per week, '+esc(c.name)+'" data-c-field="wk" data-c-idx="'+i+'" min="0" max="10" value="'+(c.wk||0)+'"></td>'+
+    '<td class="n"><input type="number" aria-label="Credits, '+esc(c.name)+'" data-c-field="cr" data-c-idx="'+i+'" min="1" max="15" value="'+(c.cr||3)+'"></td>'+
+    '<td><button type="button" class="btn-del" title="Remove Subject" data-c-del="'+i+'">✕</button></td>'+
+    '</tr>';
+  });
+  $('#att-edit').innerHTML = h + '</tbody>';
+
+  updateSubjectDatalist();
+}
+
+function updBack(){
+  var np=newPoints(), bc=backCredits(), now=cgpaNow(), aft=cgpaAfter();
+  var tr='', targets=[5,6,7,7.14,7.48];
+  targets.forEach(function(T){
+    var need=bc?(T*st.cr-st.pts)/bc:0;
+    var v=need>10+1e-9?pillHtml('bad','Not possible'):need<=0?pillHtml('good','Already above'):pillHtml(need>9?'warn':'good','Reachable');
+    tr+='<tr><td class="n">'+T+'</td><td class="n">'+(need<=0?'any pass':f2(need))+'</td><td>'+v+'</td></tr>';
+  });
+
+  var ch=DEFAULT_BACKLOGS.map(function(b,i){
+    var left=Math.max(0,(+st.allowed||0)-(+st.b[i].used||0));
+    return '<tr><td>'+esc(b.name)+'</td><td class="n">'+left+' of '+st.allowed+'</td><td>'+(left===0?pillHtml('bad','No chances left'):left===1?pillHtml('warn','Last chance'):pillHtml('good','Open'))+'</td></tr>';
+  }).join('');
+
+  $('#back-out').innerHTML=
+   '<div class="result"><div><div class="lbl">Sem 1-2 CGPA now</div><div class="big">'+f2(now)+'</div><div class="sub">'+f2(now*9.5)+'% equivalent</div></div>'+
+   '<div><div class="lbl">After backlogs clear</div><div class="big">'+f2(aft)+'</div><div class="sub">'+f2(aft*9.5)+'% · +'+f2(aft-now)+'</div></div>'+
+   '<div><div class="lbl">Grade points added</div><div class="big">+'+np+'</div><div class="sub">across '+bc+' backlog credits</div></div></div>'+
+   '<div class="cols"><div><h3>Grade needed for target Sem 1-2 CGPA</h3><div class="tw"><table><thead><tr><th class="n">Target</th><th class="n">Avg grade pts needed</th><th>Verdict</th></tr></thead><tbody>'+tr+'</tbody></table></div></div>'+
+   '<div><h3>Chances left per backlog paper</h3><div class="tw"><table><thead><tr><th>Course</th><th class="n">Chances</th><th>Status</th></tr></thead><tbody>'+ch+'</tbody></table></div></div></div>'+
+   '<p class="note">Attempts allowed is configurable above. When backlogs are cleared, grade points are factored into your full 8-semester degree planner below.</p>';
+
+  // Backlog editor table
+  var b='<thead><tr><th>Failed course</th><th class="n">Credits</th><th>Expected grade points</th><th class="n">Attempts used</th></tr></thead><tbody>';
+  DEFAULT_BACKLOGS.forEach(function(x,i){
+    var opts='';[10,9,8,7,6,5,4].forEach(function(g){opts+='<option value="'+g+'"'+(st.b[i].gp==g?' selected':'')+'>'+g+'</option>'});
+    b+='<tr><td>'+esc(x.name)+'</td>'+
+    '<td class="n"><input type="number" aria-label="Credits, '+esc(x.name)+'" data-k="b.'+i+'.cr" min="0" step="1" value="'+st.b[i].cr+'"></td>'+
+    '<td><select aria-label="Expected grade points, '+esc(x.name)+'" data-k="b.'+i+'.gp">'+opts+'</select></td>'+
+    '<td class="n"><input type="number" aria-label="Attempts used, '+esc(x.name)+'" data-k="b.'+i+'.used" min="0" step="1" value="'+st.b[i].used+'"></td></tr>';
+  });
+  $('#back-edit').innerHTML=b+'</tbody>';
+
+  // Presets
+  var pr='<span class="lbl" style="align-self:center">Set backlogs grade to</span>';
+  [10,9,8,7,6].forEach(function(g){pr+='<button type="button" data-preset="'+g+'">'+g+'</button>'});
+  $('#presets').innerHTML=pr;
+
+  // Render 8-Semester Roadmap
+  renderRoadmap();
+}
+
+function renderRoadmap(){
+  var roadmap = calcDegreeRoadmap();
+  var tableHtml = '<thead><tr><th>Semester</th><th>Status</th><th class="n">Credits</th><th class="n">Target SGPA</th><th class="n">Pts Earned</th><th class="n">Cumulative CGPA</th><th class="n">Equivalent %</th></tr></thead><tbody>';
+  
+  roadmap.list.forEach(function(row){
+    var semObj = st.semesters[row.num];
+    var isPast = row.status === 'completed';
+    var isCurrent = row.status === 'current';
+    var isSelected = row.num === st.activeSem;
+    
+    var statusPill = isPast ? pillHtml('good','Done') : isCurrent ? pillHtml('warn','Active') : pillHtml('na','Ahead');
+    var rowClass = isSelected ? 'active-sem-row' : '';
+
+    var sgpaControl = '';
+    if(isPast){
+      sgpaControl = '<span style="font-family:var(--f-mono)">'+f2(row.sgpa)+'</span>';
+    } else {
+      sgpaControl = '<input type="number" class="sgpa-box" min="4" max="10" step="0.1" value="'+f2(row.sgpa)+'" data-sem-sgpa="'+row.num+'">';
+    }
+
+    tableHtml += '<tr class="'+rowClass+'">'+
+      '<td><strong>'+esc(row.roman)+'</strong><small style="display:block;color:var(--muted)">'+esc(semObj.term)+'</small></td>'+
+      '<td>'+statusPill+'</td>'+
+      '<td class="n"><input type="number" class="sgpa-box" style="max-width:55px" min="10" max="30" value="'+row.cr+'" data-sem-cr="'+row.num+'"></td>'+
+      '<td class="n">'+sgpaControl+'</td>'+
+      '<td class="n">'+f2(row.pts)+'</td>'+
+      '<td class="n"><strong>'+f2(row.cumulativeCgpa)+'</strong></td>'+
+      '<td class="n">'+f2(row.cumulativeCgpa*9.5)+'%</td>'+
+      '</tr>';
+  });
+
+  tableHtml += '</tbody>';
+  $('#roadmap-table').innerHTML = tableHtml;
+
+  var divText = roadmap.finalCgpa >= 7.5 ? 'First Class with Distinction' : roadmap.finalCgpa >= 6.5 ? 'First Division' : 'Second Division';
+  $('#roadmap-summary').innerHTML = 
+    '<div class="result" style="margin:0">'+
+      '<div><div class="lbl">Total Degree Credits</div><div class="big">'+roadmap.totalCredits+' / '+st.deg+'</div><div class="sub">across 8 semesters</div></div>'+
+      '<div><div class="lbl">Projected Degree CGPA</div><div class="big">'+f2(roadmap.finalCgpa)+'</div><div class="sub">'+f2(roadmap.finalCgpa*9.5)+'% percentage</div></div>'+
+      '<div><div class="lbl">Projected Classification</div><div class="big" style="font-size:1.4rem">'+divText+'</div><div class="sub">Based on standard UGC / University criteria</div></div>'+
+    '</div>';
+}
+
+function updFees(){
+  var n=0;st.b.forEach(function(b){if(b.on)n++});
+  var fee=+st.fee||0;
+  var list=DEFAULT_BACKLOGS.map(function(b,i){
+    return '<tr><td><input type="checkbox" id="on'+i+'" data-k="b.'+i+'.on" '+(st.b[i].on?'checked':'')+' aria-label="Appearing in '+esc(b.name)+'"></td><td><label for="on'+i+'">'+esc(b.name)+'</label></td><td class="n">'+st.b[i].cr+'</td><td class="n">'+(st.b[i].on?money(fee):'–')+'</td></tr>';
+  }).join('');
+  var sc='';
+  for(var k=0;k<=n;k++){sc+='<tr><td class="n">'+k+'</td><td class="n">'+money((n+k)*fee)+'</td><td class="n">'+money(k*fee)+'</td></tr>'}
+  $('#fee-out').innerHTML=
+   '<div class="result"><div><div class="lbl">Papers appearing</div><div class="big">'+n+'</div></div><div><div class="lbl">First-round cost</div><div class="big">'+money(n*fee)+'</div></div></div>'+
+   '<div class="tw"><table><thead><tr><th>Appear</th><th>Paper</th><th class="n">Credits</th><th class="n">Fee</th></tr></thead><tbody>'+list+'</tbody></table></div>'+
+   '<div style="margin-top:24px"><h3>If some papers need another attempt</h3><div class="tw"><table><thead><tr><th class="n">Papers failed again</th><th class="n">Total spend</th><th class="n">Extra spend</th></tr></thead><tbody>'+sc+'</tbody></table></div>'+
+   '<p class="note">Each paper is charged once per attempt at the fee you entered. Add any form or late charges into the fee per paper.</p></div>';
+}
+
+function updExams(){
+  var sem = getActiveSemester();
+  $('#exam-title').textContent = 'Exam schedule · ' + sem.name + ' (' + sem.roman + ')';
+  $('#exam-desc').textContent = 'Exams and test dates for ' + sem.term + '. Click ✎ Edit on any subject to adjust details.';
+
+  if(!sem.exams || sem.exams.length === 0){
+    $('#exam-out').innerHTML = '<div class="empty-box">No exams scheduled yet for '+esc(sem.name)+'. Click <b>+ Add Exam</b> above to schedule exam dates!</div>';
+    return;
+  }
+
+  var ids = (sem.courses||[]).map(function(c){return c.id});
+  $('#exam-out').innerHTML = sem.exams.map(function(e, idx){
+    var isEditing = (st.editingExamIdx === idx);
+
+    if(isEditing){
+      return '<div class="exam editing-exam">'+
+        '<div style="grid-column:1/-1">'+
+          '<div style="font:600 .72rem var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px">Edit Exam &amp; Subject Details</div>'+
+          '<div class="add-form-inline" style="background:transparent;padding:0;border:none;margin-top:0">'+
+            '<div class="field" style="flex:2 1 200px">'+
+              '<label>Subject / Course Name</label>'+
+              '<input type="text" id="edit-e-name-'+idx+'" list="sem-subject-list" value="'+esc(e.name)+'">'+
+            '</div>'+
+            '<div class="field" style="max-width:120px">'+
+              '<label>Course Code</label>'+
+              '<input type="text" id="edit-e-code-'+idx+'" value="'+esc(e.code)+'">'+
+            '</div>'+
+            '<div class="field" style="max-width:160px">'+
+              '<label>Exam Date</label>'+
+              '<input type="date" id="edit-e-date-'+idx+'" value="'+e.date+'">'+
+            '</div>'+
+            '<div class="field" style="max-width:130px">'+
+              '<label>Day</label>'+
+              '<select id="edit-e-day-'+idx+'">'+
+                '<option value="Monday"'+(e.day==='Monday'?' selected':'')+'>Monday</option>'+
+                '<option value="Tuesday"'+(e.day==='Tuesday'?' selected':'')+'>Tuesday</option>'+
+                '<option value="Wednesday"'+(e.day==='Wednesday'?' selected':'')+'>Wednesday</option>'+
+                '<option value="Thursday"'+(e.day==='Thursday'?' selected':'')+'>Thursday</option>'+
+                '<option value="Friday"'+(e.day==='Friday'?' selected':'')+'>Friday</option>'+
+                '<option value="Saturday"'+(e.day==='Saturday'?' selected':'')+'>Saturday</option>'+
+              '</select>'+
+            '</div>'+
+            '<div style="display:flex;gap:6px">'+
+              '<button type="button" class="btn btn-sm btn-accent" data-e-save="'+idx+'">Save</button>'+
+              '<button type="button" class="btn btn-sm" data-e-cancel="'+idx+'">Cancel</button>'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+    }
+
+    var i = ids.indexOf(e.cid);
+    if(i < 0){
+      // Try to find course by matching name or code
+      i = (sem.courses||[]).findIndex(function(c){return c.name.toLowerCase()===e.name.toLowerCase() || (c.code&&c.code===e.code)});
+    }
+    var r = (i >= 0) ? semCourseCalc(sem, i) : null;
+    var d = daysUntil(e.date);
+    var dt = parse(e.date);
+    var mon = dt.toLocaleString('en-GB',{month:'short'}).toUpperCase();
+    var tag = '';
+    if(r){
+      tag = r.s==='good'?pillHtml('good','Attendance safe'):r.s==='warn'?pillHtml('warn','Needs '+r.need+' of '+r.rem):pillHtml('bad','Below '+sem.thr+'%');
+    }
+    return '<div class="exam">'+
+      '<div class="d">'+dt.getDate()+'<small>'+mon+' · '+e.day.slice(0,3).toUpperCase()+'</small></div>'+
+      '<div class="t"><strong>'+esc(e.name)+'</strong><span>'+esc(e.code)+(r&&r.pct!=null?' · attendance '+f2(r.pct*100)+'%':'')+'</span></div>'+
+      '<div class="left">'+(d>0?d+' days left':d===0?'Today':'Done')+(tag?'<br>'+tag:'')+'</div>'+
+      '<div class="exam-actions">'+
+        '<button type="button" class="btn btn-sm" data-e-edit="'+idx+'" title="Edit Subject &amp; Exam">✎ Edit</button>'+
+        '<button type="button" class="btn-del" data-e-del="'+idx+'" title="Delete exam">✕</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function updateAll(){
+  var sem = getActiveSemester();
+  $('#mast-sub').textContent = 'Mayank · URN 2581199 · B.Tech CSE · ' + sem.name + ' (' + sem.roman + ') · ' + (sem.status==='completed'?'Completed':sem.status==='current'?'Current':'Upcoming');
+  renderSemPills();
+  updStrip();
+  updAtt();
+  updBack();
+  updFees();
+  updExams();
+  updateSubjectDatalist();
+}
+
+function showTab(name){
+  ['attendance','backlogs','fees','exams'].forEach(function(k){
+    $('#p-'+k).hidden = k!==name;
+    $('#t-'+k).setAttribute('aria-selected',k===name?'true':'false');
+  });
+}
+
+function switchSemester(semNum){
+  st.activeSem = +semNum;
+  st.editingExamIdx = null;
+  save();
+  updateAll();
+}
+
+/* Event listeners */
+
+document.addEventListener('input',function(ev){
+  var el=ev.target;
+  
+  if(el.dataset && el.dataset.semSgpa){
+    var sNum = +el.dataset.semSgpa;
+    var val = parseFloat(el.value);
+    if(!isNaN(val) && st.semesters[sNum]){
+      st.semesters[sNum].sgpa = Math.min(10, Math.max(0, val));
+      save();
+      updStrip();
+      renderRoadmap();
+    }
+    return;
+  }
+
+  if(el.dataset && el.dataset.semCr){
+    var sNum2 = +el.dataset.semCr;
+    var val2 = parseFloat(el.value);
+    if(!isNaN(val2) && st.semesters[sNum2]){
+      st.semesters[sNum2].cr = Math.max(1, val2);
+      save();
+      updStrip();
+      renderRoadmap();
+    }
+    return;
+  }
+
+  // Course field edits (including subject name, code, kind, att, sch, wk, cr)
+  if(el.dataset && el.dataset.cField){
+    var idx = +el.dataset.cIdx;
+    var field = el.dataset.cField;
+    var sem = getActiveSemester();
+    if(sem && sem.courses && sem.courses[idx]){
+      var v;
+      if(field==='name' || field==='code' || field==='kind'){
+        v = el.value;
+      } else {
+        v = parseFloat(el.value);
+        if(isNaN(v)) v = 0;
+      }
+      sem.courses[idx][field] = v;
+      save();
+      updateSubjectDatalist();
+      // Only refresh summary strip & datalists during active typing to avoid losing input cursor focus
+      updStrip();
+    }
+    return;
+  }
+
+  // Auto-fill code when subject is picked in Add Exam form
+  if(el.id==='new-e-name'){
+    var curSem = getActiveSemester();
+    var match = (curSem.courses||[]).find(function(c){return c.name.toLowerCase() === el.value.trim().toLowerCase()});
+    if(match && match.code){
+      $('#new-e-code').value = match.code;
+    }
+  }
+
+  // Attendance simulation slider
+  if(el.id==='sim'){
+    var sem2 = getActiveSemester();
+    sem2.sim = +el.value;
+    save();
+    var o = semOverall(sem2);
+    var simCalc = o.S+o.rem ? ((o.A + o.rem * sem2.sim / 100) / (o.S + o.rem) * 100) : 0;
+    $('#simtxt').innerHTML = '<output>'+sem2.sim+'%</output> of remaining classes yields <b>'+f2(simCalc)+'%</b> overall';
+    return;
+  }
+
+  if(el.id==='thr'||el.id==='end'||el.id==='off'){
+    var active = getActiveSemester();
+    if(el.id==='end') active.end = el.value;
+    else active[el.id] = parseFloat(el.value) || 0;
+    save();
+    updStrip();
+    updAtt();
+    return;
+  }
+
+  if(el.dataset && el.dataset.k){
+    var k = el.dataset.k;
+    var val3;
+    if(el.type==='checkbox') val3 = el.checked;
+    else { val3 = parseFloat(el.value); if(isNaN(val3)) val3 = 0; }
+    
+    var obj=st, a=k.split('.');
+    for(var i=0;i<a.length-1;i++) obj=obj[a[i]];
+    obj[a[a.length-1]] = val3;
+    save();
+    updateAll();
+  }
+});
+
+// Full re-render on blur from table inputs
+document.addEventListener('change',function(ev){
+  var el = ev.target;
+  if(el.dataset && el.dataset.cField){
+    var sem = getActiveSemester();
+    var rows = sem.courses.map(function(c,i){return {c:c,i:i,r:semCourseCalc(sem,i)}});
+    rows.sort(function(a,b){var x=a.r.pct==null?9:a.r.pct,y=b.r.pct==null?9:b.r.pct;return x-y});
+    
+    var t = +sem.thr || 75;
+    $('#att-list').innerHTML = rows.map(function(x){
+      var r=x.r, c=x.c, note;
+      if(r.s==='na') note = pillHtml('na','No sessions')+'Nothing scheduled yet.';
+      else if(r.s==='good') note = pillHtml('good','Safe')+'Can skip '+r.canMiss+' of '+r.rem+' left.';
+      else if(r.s==='warn') note = pillHtml('warn','Recoverable')+'Attend '+r.need+' of '+r.rem+' left.';
+      else note = pillHtml('bad','Out of reach')+'Best case '+f2(r.maxPct*100)+'% with all '+r.rem+' left.';
+      
+      var w = r.pct==null?0:Math.min(100,r.pct*100);
+      return '<div class="crow"><div class="cname">'+esc(c.name)+'<small>'+(c.code?esc(c.code)+' · ':'')+esc(c.kind||'Theory')+' · '+(c.cr||3)+' cr</small></div>'+
+       '<div class="bar" role="img" aria-label="'+(r.pct==null?'No data':f2(r.pct*100)+' percent')+'"><i class="'+(r.s==='na'?'':r.s)+'" style="width:'+w+'%"></i><b style="left:calc('+t+'% - 1px)"></b></div>'+
+       '<div class="cnum">'+r.A+'/'+r.S+' · '+(r.pct==null?'–':f2(r.pct*100)+'%')+'</div><div class="cnote">'+note+'</div></div>';
+    }).join('');
+    updExams();
+  }
+});
+
+document.addEventListener('click',function(ev){
+  var t=ev.target.closest('[data-tab]');
+  if(t){showTab(t.dataset.tab);return}
+
+  var semBtn=ev.target.closest('[data-sem-btn]');
+  if(semBtn){switchSemester(semBtn.dataset.semBtn);return}
+
+  var p=ev.target.closest('[data-preset]');
+  if(p){
+    var g=+p.dataset.preset;
+    st.b.forEach(function(b){b.gp=g});
+    document.querySelectorAll('#back-edit select').forEach(function(s){s.value=g});
+    save();updateAll();
+    return;
+  }
+
+  var sgpaP=ev.target.closest('[data-sgpa-preset]');
+  if(sgpaP){
+    var targetVal = parseFloat(sgpaP.dataset.sgpaPreset);
+    [3,4,5,6,7,8].forEach(function(sNum){
+      if(st.semesters[sNum]) st.semesters[sNum].sgpa = targetVal;
+    });
+    save();
+    updStrip();
+    renderRoadmap();
+    return;
+  }
+
+  // Delete subject
+  var cDel = ev.target.closest('[data-c-del]');
+  if(cDel){
+    var cIdx = +cDel.dataset.cDel;
+    var curSem = getActiveSemester();
+    if(curSem && curSem.courses && curSem.courses[cIdx]){
+      if(confirm('Remove subject "' + curSem.courses[cIdx].name + '" from ' + curSem.name + '?')){
+        curSem.courses.splice(cIdx, 1);
+        save();
+        updStrip();
+        updAtt();
+        updExams();
+      }
+    }
+    return;
+  }
+
+  // Edit exam
+  var eEdit = ev.target.closest('[data-e-edit]');
+  if(eEdit){
+    st.editingExamIdx = +eEdit.dataset.eEdit;
+    updExams();
+    return;
+  }
+
+  // Cancel exam editing
+  var eCancel = ev.target.closest('[data-e-cancel]');
+  if(eCancel){
+    st.editingExamIdx = null;
+    updExams();
+    return;
+  }
+
+  // Save exam editing
+  var eSave = ev.target.closest('[data-e-save]');
+  if(eSave){
+    var idx = +eSave.dataset.eSave;
+    var curSem3 = getActiveSemester();
+    if(curSem3 && curSem3.exams && curSem3.exams[idx]){
+      var nameVal = $('#edit-e-name-' + idx).value.trim();
+      var codeVal = $('#edit-e-code-' + idx).value.trim();
+      var dateVal = $('#edit-e-date-' + idx).value;
+      var dayVal = $('#edit-e-day-' + idx).value;
+      if(!nameVal || !dateVal){alert('Subject name and date are required');return}
+      
+      curSem3.exams[idx].name = nameVal;
+      curSem3.exams[idx].code = codeVal;
+      curSem3.exams[idx].date = dateVal;
+      curSem3.exams[idx].day = dayVal;
+      
+      st.editingExamIdx = null;
+      save();
+      updStrip();
+      updExams();
+    }
+    return;
+  }
+
+  // Delete exam
+  var eDel = ev.target.closest('[data-e-del]');
+  if(eDel){
+    var eIdx = +eDel.dataset.eDel;
+    var curSem2 = getActiveSemester();
+    if(curSem2 && curSem2.exams && curSem2.exams[eIdx]){
+      if(confirm('Delete exam entry for "' + curSem2.exams[eIdx].name + '"?')){
+        curSem2.exams.splice(eIdx, 1);
+        st.editingExamIdx = null;
+        save();
+        updStrip();
+        updExams();
+      }
+    }
+    return;
+  }
+});
+
+// Theme button click handler
+$('#theme-btn').addEventListener('click',function(){
+  var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try{localStorage.setItem(THEME_KEY, next);}catch(e){}
+  updateThemeButton();
+});
+
+/* Add Course Inline Form handlers */
+$('#btn-show-add-course').addEventListener('click',function(){
+  $('#box-add-course').style.display = $('#box-add-course').style.display === 'none' ? 'flex' : 'none';
+});
+$('#btn-cancel-course').addEventListener('click',function(){
+  $('#box-add-course').style.display = 'none';
+});
+$('#btn-save-course').addEventListener('click',function(){
+  var name = $('#new-c-name').value.trim();
+  if(!name){alert('Please enter a course name');return}
+  var code = $('#new-c-code').value.trim();
+  var kind = $('#new-c-kind').value;
+  var cr = parseFloat($('#new-c-cr').value) || 3;
+  var wk = parseFloat($('#new-c-wk').value) || 3;
+  
+  var curSem = getActiveSemester();
+  curSem.courses.push({
+    id: 'c_' + Date.now(),
+    name: name,
+    code: code,
+    kind: kind,
+    cr: cr,
+    wk: wk,
+    att: 0,
+    sch: 0
+  });
+  save();
+  $('#new-c-name').value = '';
+  $('#new-c-code').value = '';
+  $('#box-add-course').style.display = 'none';
+  updStrip();
+  updAtt();
+});
+
+/* Add Exam Inline Form handlers */
+$('#btn-show-add-exam').addEventListener('click',function(){
+  $('#box-add-exam').style.display = $('#box-add-exam').style.display === 'none' ? 'flex' : 'none';
+  updateSubjectDatalist();
+});
+$('#btn-cancel-exam').addEventListener('click',function(){
+  $('#box-add-exam').style.display = 'none';
+});
+$('#btn-save-exam').addEventListener('click',function(){
+  var name = $('#new-e-name').value.trim();
+  var date = $('#new-e-date').value;
+  if(!name || !date){alert('Please enter course name and date');return}
+  var code = $('#new-e-code').value.trim();
+  var day = $('#new-e-day').value;
+  
+  var curSem = getActiveSemester();
+  if(!curSem.exams) curSem.exams = [];
+  curSem.exams.push({
+    id: 'e_' + Date.now(),
+    name: name,
+    code: code,
+    date: date,
+    day: day
+  });
+  save();
+  $('#new-e-name').value = '';
+  $('#new-e-code').value = '';
+  $('#box-add-exam').style.display = 'none';
+  updStrip();
+  updExams();
+});
+
+// Initial render
+updateAll();
+
+var h=(location.hash||'').replace('#','');
+if(['attendance','backlogs','fees','exams'].indexOf(h)>=0) showTab(h);
+
+})();
+</script>
+</body></html>
