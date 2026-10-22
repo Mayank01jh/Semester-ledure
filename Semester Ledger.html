@@ -126,7 +126,7 @@ section.panel[hidden]{display:none}
 .controls{display:flex;flex-wrap:wrap;gap:12px 20px;margin:12px 0 20px}
 .field{display:flex;flex-direction:column;gap:4px;min-width:0}
 .field label{font:600 .72rem var(--f-mono);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
-input[type=text],input[type=number],input[type=date],select{font:500 .92rem var(--f-mono);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:3px;padding:7px 9px;width:100%;max-width:160px;min-width:0}
+input[type=text],input[type=password],input[type=number],input[type=date],select{font:500 .92rem var(--f-mono);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:3px;padding:7px 9px;width:100%;max-width:160px;min-width:0}
 input[type=range]{width:100%;accent-color:var(--ink)}
 
 .overall{display:grid;grid-template-columns:150px 1fr;gap:20px 28px;align-items:center;padding:16px 0 20px;border-bottom:1px solid var(--line)}
@@ -220,11 +220,151 @@ h3{font:700 1rem var(--f-display);margin:0 0 8px;color:var(--ink)}
   .exam .left{grid-column:1/-1;text-align:left}
 }
 @media (prefers-reduced-motion:no-preference){.bar i{transition:width .3s}}
+
+/* Auth & Passcode Security System */
+#auth-overlay{position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.auth-card{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;padding:30px 24px;box-shadow:0 16px 36px rgba(0,0,0,0.18);position:relative;animation:authCardIn .22s cubic-bezier(0.16,1,0.3,1)}
+@keyframes authCardIn{from{opacity:0;transform:scale(0.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.auth-top-bar{position:absolute;top:14px;right:16px}
+.auth-header{text-align:center;margin-bottom:20px}
+.auth-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;border:1px solid var(--line);background:var(--surface-subtle);font:600 .72rem var(--f-mono);color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
+.auth-title{font:700 1.5rem/1.2 var(--f-display);letter-spacing:-.02em;margin:0 0 6px;color:var(--ink)}
+.auth-desc{font-size:.84rem;color:var(--muted);margin:0;line-height:1.4}
+.auth-form{display:flex;flex-direction:column;gap:15px}
+.auth-field{display:flex;flex-direction:column;gap:5px}
+.auth-field label{font:600 .72rem var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.auth-input-group{position:relative;display:flex;align-items:center}
+.auth-input-group input{max-width:100%!important;width:100%!important;padding:9px 62px 9px 10px!important;font-size:1rem!important;letter-spacing:.08em}
+.auth-toggle-btn{position:absolute;right:6px;background:var(--surface-subtle);border:1px solid var(--line);font:600 .7rem var(--f-mono);color:var(--muted);cursor:pointer;padding:3px 7px;text-transform:uppercase;border-radius:3px;transition:all .15s}
+.auth-toggle-btn:hover{color:var(--ink);border-color:var(--ink)}
+.auth-error{font:500 .8rem var(--f-mono);color:var(--bad);background:var(--surface-subtle);border-left:3px solid var(--bad);padding:8px 10px;border-radius:2px;margin-top:4px}
+.auth-remember{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted);cursor:pointer;user-select:none;margin-top:2px}
+.auth-remember input[type=checkbox]{accent-color:var(--ink);cursor:pointer;width:15px;height:15px}
+.auth-btn-primary{width:100%;padding:10px 14px;font:600 .9rem var(--f-mono);border-radius:4px;cursor:pointer;justify-content:center}
+.auth-footer{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);display:flex;justify-content:space-between;align-items:center;font-size:.78rem;color:var(--muted)}
+.auth-link-btn{color:var(--muted);text-decoration:underline;background:none;border:none;font:500 .78rem var(--f-mono);cursor:pointer;padding:0}
+.auth-link-btn:hover{color:var(--ink)}
+
+/* Shake Animation */
+@keyframes authShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.shake{animation:authShake 0.4s ease-in-out}
+
+/* Security Modal */
+.security-modal{position:fixed;inset:0;z-index:99990;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:20px}
+.security-modal-box{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;padding:24px;box-shadow:0 16px 36px rgba(0,0,0,0.25);position:relative}
 </style>
 
 <!-- Shared Datalist for active semester subjects -->
 <datalist id="sem-subject-list"></datalist>
 
+<!-- Authentication & Passcode Screen Overlay -->
+<div id="auth-overlay" role="dialog" aria-modal="true" style="display:flex;">
+  <!-- Mode 1: First-time Passcode Setup -->
+  <div id="auth-card-setup" class="auth-card" style="display:none;">
+    <div class="auth-top-bar">
+      <button type="button" class="btn-theme auth-theme-toggle" title="Toggle Stark White / Pitch Black theme">● Theme</button>
+    </div>
+    <div class="auth-header">
+      <div class="auth-badge">🛡️ Ledger Security</div>
+      <h2 class="auth-title">Set Master Passcode</h2>
+      <p class="auth-desc">Create a secure pass to safeguard your academic records, attendance logs, and CGPA projections.</p>
+    </div>
+    <form id="auth-form-setup" class="auth-form" onsubmit="return false;">
+      <div class="auth-field">
+        <label for="auth-setup-pass">New Passcode / Password</label>
+        <div class="auth-input-group">
+          <input type="password" id="auth-setup-pass" autocomplete="new-password" placeholder="Enter new pass (min 3 chars)" required minlength="3">
+          <button type="button" class="auth-toggle-btn" data-target="auth-setup-pass">Show</button>
+        </div>
+      </div>
+      <div class="auth-field">
+        <label for="auth-setup-confirm">Confirm Passcode</label>
+        <div class="auth-input-group">
+          <input type="password" id="auth-setup-confirm" autocomplete="new-password" placeholder="Re-enter pass" required minlength="3">
+          <button type="button" class="auth-toggle-btn" data-target="auth-setup-confirm">Show</button>
+        </div>
+        <div id="auth-setup-error" class="auth-error" style="display:none;"></div>
+      </div>
+      <button type="submit" id="btn-do-setup" class="btn btn-accent auth-btn-primary">Set Passcode &amp; Open Ledger &rarr;</button>
+    </form>
+    <div class="auth-footer">
+      <span>Stored locally on this device</span>
+      <span style="font-family:var(--f-mono);font-size:.72rem;">Mayank · URN 2581199</span>
+    </div>
+  </div>
+
+  <!-- Mode 2: Locked Passcode Prompt -->
+  <div id="auth-card-unlock" class="auth-card" style="display:none;">
+    <div class="auth-top-bar">
+      <button type="button" class="btn-theme auth-theme-toggle" title="Toggle Stark White / Pitch Black theme">● Theme</button>
+    </div>
+    <div class="auth-header">
+      <div class="auth-badge">🔒 Locked Vault</div>
+      <h2 class="auth-title">Semester Ledger</h2>
+      <p class="auth-desc">Enter your pass to access attendance, backlogs, and degree progression.</p>
+    </div>
+    <form id="auth-form-unlock" class="auth-form" onsubmit="return false;">
+      <div class="auth-field">
+        <label for="auth-unlock-pass">Passcode / Password</label>
+        <div class="auth-input-group">
+          <input type="password" id="auth-unlock-pass" autocomplete="current-password" placeholder="Enter your pass" required autofocus>
+          <button type="button" class="auth-toggle-btn" data-target="auth-unlock-pass">Show</button>
+        </div>
+        <div id="auth-unlock-error" class="auth-error" style="display:none;"></div>
+      </div>
+      <label class="auth-remember">
+        <input type="checkbox" id="auth-remember-chk" checked>
+        <span>Remember unlock on this browser</span>
+      </label>
+      <button type="submit" id="btn-do-unlock" class="btn btn-accent auth-btn-primary">Unlock Ledger &rarr;</button>
+    </form>
+    <div class="auth-footer">
+      <span>Mayank · B.Tech CSE</span>
+      <button type="button" id="btn-auth-reset" class="auth-link-btn">Reset Passcode?</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Dialog: Change Passcode -->
+<div id="security-modal" class="security-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="sec-modal-title">
+  <div class="security-modal-box">
+    <div class="auth-header" style="text-align:left;margin-bottom:16px;">
+      <div class="auth-badge">🔑 Passcode Settings</div>
+      <h2 id="sec-modal-title" class="auth-title" style="font-size:1.25rem;">Change Master Passcode</h2>
+      <p class="auth-desc">Update your security pass for Semester Ledger.</p>
+    </div>
+    <form id="auth-form-change" class="auth-form" onsubmit="return false;">
+      <div class="auth-field">
+        <label for="auth-chg-current">Current Passcode</label>
+        <div class="auth-input-group">
+          <input type="password" id="auth-chg-current" placeholder="Current pass" required>
+          <button type="button" class="auth-toggle-btn" data-target="auth-chg-current">Show</button>
+        </div>
+      </div>
+      <div class="auth-field">
+        <label for="auth-chg-new">New Passcode</label>
+        <div class="auth-input-group">
+          <input type="password" id="auth-chg-new" placeholder="New pass (min 3 chars)" required minlength="3">
+          <button type="button" class="auth-toggle-btn" data-target="auth-chg-new">Show</button>
+        </div>
+      </div>
+      <div class="auth-field">
+        <label for="auth-chg-confirm">Confirm New Passcode</label>
+        <div class="auth-input-group">
+          <input type="password" id="auth-chg-confirm" placeholder="Confirm new pass" required minlength="3">
+          <button type="button" class="auth-toggle-btn" data-target="auth-chg-confirm">Show</button>
+        </div>
+        <div id="auth-chg-error" class="auth-error" style="display:none;"></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+        <button type="button" id="btn-chg-cancel" class="btn">Cancel</button>
+        <button type="submit" id="btn-chg-save" class="btn btn-accent">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="app-wrapper" style="display:none;">
 <header class="mast">
   <div class="wrap">
     <div class="brand">
@@ -239,6 +379,8 @@ h3{font:700 1rem var(--f-display);margin:0 0 8px;color:var(--ink)}
         <button role="tab" id="t-exams" aria-selected="false" data-tab="exams">Exams</button>
       </nav>
       <button type="button" id="theme-btn" class="btn-theme" title="Toggle Stark White / Pitch Black theme">● B&amp;W Theme</button>
+      <button type="button" id="btn-security" class="btn-theme" title="Passcode Settings">🔑 Passcode</button>
+      <button type="button" id="btn-lock" class="btn-theme" title="Lock Semester Ledger">🔒 Lock</button>
     </div>
   </div>
 </header>
@@ -387,6 +529,7 @@ h3{font:700 1rem var(--f-display);margin:0 0 8px;color:var(--ink)}
     <div id="exam-out"></div>
   </section>
 </main>
+</div><!-- /#app-wrapper -->
 
 <script>
 (function(){
@@ -409,6 +552,9 @@ function updateThemeButton(){
   if(btn){
     btn.innerHTML = cur === 'dark' ? '○ White Mode' : '● Black Mode';
   }
+  document.querySelectorAll('.auth-theme-toggle').forEach(function(b){
+    b.innerHTML = cur === 'dark' ? '○ White' : '● Black';
+  });
 }
 updateThemeButton();
 
@@ -1394,6 +1540,300 @@ updateAll();
 
 var h=(location.hash||'').replace('#','');
 if(['attendance','backlogs','fees','exams'].indexOf(h)>=0) showTab(h);
+
+/* ==================== SECURITY & AUTH SYSTEM ==================== */
+var AUTH_KEY = 'semester-ledger-auth-v1';
+var AUTH_SESSION_KEY = 'semester-ledger-auth-unlocked';
+var AUTH_REMEMBER_KEY = 'semester-ledger-remember-token';
+
+function getStoredAuth() {
+  try {
+    var raw = localStorage.getItem(AUTH_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) {
+    return null;
+  }
+}
+
+async function computeHash(password, salt) {
+  var str = salt + ':' + password;
+  if (window.crypto && window.crypto.subtle && window.crypto.subtle.digest) {
+    try {
+      var buf = new TextEncoder().encode(str);
+      var hashBuf = await window.crypto.subtle.digest('SHA-256', buf);
+      return Array.from(new Uint8Array(hashBuf)).map(function(b){ return b.toString(16).padStart(2, '0'); }).join('');
+    } catch(e) {}
+  }
+  var h1 = 0xdeadbeef ^ str.length, h2 = 0x41c64e6d ^ str.length;
+  for (var i = 0, ch; i < str.length; i++) {
+    ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return 'fb_' + (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
+}
+
+function generateSalt() {
+  if (window.crypto && window.crypto.getRandomValues) {
+    var arr = new Uint8Array(16);
+    window.crypto.getRandomValues(arr);
+    return Array.from(arr).map(function(b){ return b.toString(16).padStart(2, '0'); }).join('');
+  }
+  return 'salt_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+}
+
+function isSessionUnlocked() {
+  var auth = getStoredAuth();
+  if (!auth) return false;
+  if (sessionStorage.getItem(AUTH_SESSION_KEY) === 'true') return true;
+  var remToken = localStorage.getItem(AUTH_REMEMBER_KEY);
+  if (remToken && remToken === auth.hash) return true;
+  return false;
+}
+
+function showAuthGate() {
+  var auth = getStoredAuth();
+  var appWrapper = document.getElementById('app-wrapper');
+  var overlay = document.getElementById('auth-overlay');
+  var setupCard = document.getElementById('auth-card-setup');
+  var unlockCard = document.getElementById('auth-card-unlock');
+  
+  if (appWrapper) appWrapper.style.display = 'none';
+  if (overlay) overlay.style.display = 'flex';
+  
+  var unlInput = document.getElementById('auth-unlock-pass');
+  var unlErr = document.getElementById('auth-unlock-error');
+  if (unlInput) unlInput.value = '';
+  if (unlErr) { unlErr.style.display = 'none'; unlErr.textContent = ''; }
+  
+  var setPass = document.getElementById('auth-setup-pass');
+  var setConf = document.getElementById('auth-setup-confirm');
+  var setErr = document.getElementById('auth-setup-error');
+  if (setPass) setPass.value = '';
+  if (setConf) setConf.value = '';
+  if (setErr) { setErr.style.display = 'none'; setErr.textContent = ''; }
+
+  if (!auth) {
+    if (setupCard) setupCard.style.display = 'block';
+    if (unlockCard) unlockCard.style.display = 'none';
+    setTimeout(function(){ if (setPass) setPass.focus(); }, 60);
+  } else {
+    if (setupCard) setupCard.style.display = 'none';
+    if (unlockCard) unlockCard.style.display = 'block';
+    setTimeout(function(){ if (unlInput) unlInput.focus(); }, 60);
+  }
+}
+
+function hideAuthGate() {
+  var appWrapper = document.getElementById('app-wrapper');
+  var overlay = document.getElementById('auth-overlay');
+  if (overlay) overlay.style.display = 'none';
+  if (appWrapper) appWrapper.style.display = 'block';
+}
+
+function lockLedger() {
+  sessionStorage.removeItem(AUTH_SESSION_KEY);
+  localStorage.removeItem(AUTH_REMEMBER_KEY);
+  showAuthGate();
+}
+
+function unlockLedger(remember) {
+  var auth = getStoredAuth();
+  sessionStorage.setItem(AUTH_SESSION_KEY, 'true');
+  if (remember && auth) {
+    localStorage.setItem(AUTH_REMEMBER_KEY, auth.hash);
+  } else {
+    localStorage.removeItem(AUTH_REMEMBER_KEY);
+  }
+  hideAuthGate();
+}
+
+function triggerShake(elem) {
+  if (!elem) return;
+  elem.classList.remove('shake');
+  void elem.offsetWidth;
+  elem.classList.add('shake');
+  setTimeout(function(){ elem.classList.remove('shake'); }, 500);
+}
+
+async function handleSetupSubmit() {
+  var p1 = (document.getElementById('auth-setup-pass').value || '').trim();
+  var p2 = (document.getElementById('auth-setup-confirm').value || '').trim();
+  var err = document.getElementById('auth-setup-error');
+  var card = document.getElementById('auth-card-setup');
+
+  if (p1.length < 3) {
+    err.textContent = 'Passcode must be at least 3 characters.';
+    err.style.display = 'block';
+    triggerShake(card);
+    return;
+  }
+  if (p1 !== p2) {
+    err.textContent = 'Passcodes do not match. Please re-enter.';
+    err.style.display = 'block';
+    triggerShake(card);
+    return;
+  }
+
+  var salt = generateSalt();
+  var hash = await computeHash(p1, salt);
+  var record = { salt: salt, hash: hash, createdAt: Date.now() };
+  localStorage.setItem(AUTH_KEY, JSON.stringify(record));
+  unlockLedger(true);
+}
+
+async function handleUnlockSubmit() {
+  var pass = (document.getElementById('auth-unlock-pass').value || '');
+  var err = document.getElementById('auth-unlock-error');
+  var card = document.getElementById('auth-card-unlock');
+  var chk = document.getElementById('auth-remember-chk');
+  var auth = getStoredAuth();
+
+  if (!auth) {
+    showAuthGate();
+    return;
+  }
+
+  var testHash = await computeHash(pass, auth.salt);
+  if (testHash === auth.hash) {
+    unlockLedger(chk ? chk.checked : true);
+  } else {
+    err.textContent = 'Incorrect passcode. Please try again.';
+    err.style.display = 'block';
+    triggerShake(card);
+    var unlInput = document.getElementById('auth-unlock-pass');
+    if (unlInput) {
+      unlInput.select();
+      unlInput.focus();
+    }
+  }
+}
+
+function handleAuthReset() {
+  var ok = confirm('Resetting will remove the master passcode lock so you can create a new passcode.\n\nYour academic semester data (attendance, marks, subjects) will NOT be affected.\n\nDo you want to reset your passcode?');
+  if (ok) {
+    localStorage.removeItem(AUTH_KEY);
+    localStorage.removeItem(AUTH_REMEMBER_KEY);
+    sessionStorage.removeItem(AUTH_SESSION_KEY);
+    showAuthGate();
+  }
+}
+
+function openSecurityModal() {
+  var modal = document.getElementById('security-modal');
+  var curInput = document.getElementById('auth-chg-current');
+  var err = document.getElementById('auth-chg-error');
+  if (err) { err.style.display = 'none'; err.textContent = ''; }
+  document.getElementById('auth-chg-current').value = '';
+  document.getElementById('auth-chg-new').value = '';
+  document.getElementById('auth-chg-confirm').value = '';
+  if (modal) modal.style.display = 'flex';
+  setTimeout(function(){ if (curInput) curInput.focus(); }, 60);
+}
+
+function closeSecurityModal() {
+  var modal = document.getElementById('security-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function handleChangePassSubmit() {
+  var cur = (document.getElementById('auth-chg-current').value || '');
+  var nw = (document.getElementById('auth-chg-new').value || '').trim();
+  var conf = (document.getElementById('auth-chg-confirm').value || '').trim();
+  var err = document.getElementById('auth-chg-error');
+  var box = document.querySelector('.security-modal-box');
+  var auth = getStoredAuth();
+
+  if (auth) {
+    var curHash = await computeHash(cur, auth.salt);
+    if (curHash !== auth.hash) {
+      err.textContent = 'Current passcode is incorrect.';
+      err.style.display = 'block';
+      triggerShake(box);
+      return;
+    }
+  }
+
+  if (nw.length < 3) {
+    err.textContent = 'New passcode must be at least 3 characters.';
+    err.style.display = 'block';
+    triggerShake(box);
+    return;
+  }
+  if (nw !== conf) {
+    err.textContent = 'New passcodes do not match.';
+    err.style.display = 'block';
+    triggerShake(box);
+    return;
+  }
+
+  var salt = generateSalt();
+  var hash = await computeHash(nw, salt);
+  var record = { salt: salt, hash: hash, updatedAt: Date.now() };
+  localStorage.setItem(AUTH_KEY, JSON.stringify(record));
+  if (localStorage.getItem(AUTH_REMEMBER_KEY)) {
+    localStorage.setItem(AUTH_REMEMBER_KEY, hash);
+  }
+  closeSecurityModal();
+  alert('Master passcode updated successfully!');
+}
+
+// Event Listeners for Auth
+document.getElementById('btn-do-setup').addEventListener('click', handleSetupSubmit);
+document.getElementById('auth-form-setup').addEventListener('submit', function(e){ e.preventDefault(); handleSetupSubmit(); });
+
+document.getElementById('btn-do-unlock').addEventListener('click', handleUnlockSubmit);
+document.getElementById('auth-form-unlock').addEventListener('submit', function(e){ e.preventDefault(); handleUnlockSubmit(); });
+
+document.getElementById('btn-auth-reset').addEventListener('click', handleAuthReset);
+
+document.getElementById('btn-lock').addEventListener('click', lockLedger);
+document.getElementById('btn-security').addEventListener('click', openSecurityModal);
+
+document.getElementById('btn-chg-cancel').addEventListener('click', closeSecurityModal);
+document.getElementById('btn-chg-save').addEventListener('click', handleChangePassSubmit);
+document.getElementById('auth-form-change').addEventListener('submit', function(e){ e.preventDefault(); handleChangePassSubmit(); });
+
+document.getElementById('security-modal').addEventListener('click', function(e){
+  if (e.target === this) closeSecurityModal();
+});
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') closeSecurityModal();
+});
+
+document.querySelectorAll('.auth-toggle-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var targetId = btn.getAttribute('data-target');
+    var input = document.getElementById(targetId);
+    if (!input) return;
+    if (input.type === 'password') {
+      input.type = 'text';
+      btn.textContent = 'Hide';
+    } else {
+      input.type = 'password';
+      btn.textContent = 'Show';
+    }
+  });
+});
+
+document.querySelectorAll('.auth-theme-toggle').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+    var next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try{localStorage.setItem(THEME_KEY, next);}catch(e){}
+    updateThemeButton();
+  });
+});
+
+// Initial Auth State Evaluation
+if (isSessionUnlocked()) {
+  hideAuthGate();
+} else {
+  showAuthGate();
+}
 
 })();
 </script>

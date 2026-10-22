@@ -10,6 +10,7 @@ A self-contained academic management ledger and degree progression tracker desig
 - **Backlog & CGPA Planner**: Target grade calculators, clearance effects, and 8-semester cumulative CGPA roadmap.
 - **Reappear Fee Calculator**: Cost estimation for reappear papers.
 - **Pure Black & White Aesthetic**: Stark high-contrast monochrome design with 1-click Light / Dark theme toggle.
+- **Passcode & Login Vault**: Built-in master passcode protection to lock your academic ledger, with 1-click lock, session memory, passcode change modal, and secure salted hashing.
 - **Local Persistence**: All data is stored directly in browser `localStorage`.
 
 ## Getting Started
